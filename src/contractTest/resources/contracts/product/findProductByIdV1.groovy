@@ -20,12 +20,12 @@ Contract.make {
                 addedAt: anyIso8601WithOffset(),
                 name: "Notebook X11",
                 brand: "Deep Driver",
-                regularPrice: "1500,00",
+                regularPrice: "1500.00",
                 salePrice: 1000.00,
                 inStock: false,
                 enabled: true,
-                categoryId: "",
-                description: "A gamer Notebook"
+                categoryId: anyUuid(),
+                description: "A Gamer Notebook"
         ])
     }
 }
