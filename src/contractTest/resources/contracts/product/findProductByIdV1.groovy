@@ -8,7 +8,7 @@ Contract.make {
         headers {
             accept 'application/json'
         }
-        url("api/v1/products/019c90e8-40fa-7ab0-a458-34f237b97987")
+        url("/api/v1/products/019c90e8-40fa-7ab0-a458-34f237b97987")
     }
     response {
         status 200
