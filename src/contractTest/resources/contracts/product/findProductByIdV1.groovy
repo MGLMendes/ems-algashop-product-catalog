@@ -19,12 +19,15 @@ Contract.make {
                 id: fromRequest().path(3),
                 addedAt: anyIso8601WithOffset(),
                 name: "Notebook X11",
-                brand: "Deep Driver",
+                brand: "Deep Diver",
                 regularPrice: "1500.00",
                 salePrice: 1000.00,
-                inStock: false,
+                inStock: true,
                 enabled: true,
-                categoryId: anyUuid(),
+                category: [
+                        id: anyUuid(),
+                        name: "Notebook",
+                ],
                 description: "A Gamer Notebook"
         ])
     }
