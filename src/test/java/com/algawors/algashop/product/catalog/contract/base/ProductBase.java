@@ -1,5 +1,6 @@
 package com.algawors.algashop.product.catalog.contract.base;
 
+import com.algawors.algashop.product.catalog.application.exception.ResourceNotFoundException;
 import com.algawors.algashop.product.catalog.application.product.input.ProductInput;
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algawors.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
@@ -34,6 +35,7 @@ public class ProductBase {
 
     public static final UUID validProductId = UUID.fromString("019c90e8-40fa-7ab0-a458-34f237b97987");
     public static final UUID createdProductId = UUID.fromString("019c9f9e-c0ae-7491-b1f9-9652cb52c75e");
+    public static final UUID invalidProductId = UUID.fromString("019c9fa1-c066-7284-9b95-5d482cf47a62");
 
     @BeforeEach
     void setUp() {
@@ -45,6 +47,12 @@ public class ProductBase {
         mockFindProducts();
         mockFilterProducts();
         mockCreateProduct();
+        mockInvalidFindById();
+    }
+
+    private void mockInvalidFindById() {
+        Mockito.when(productQueryService.findById(invalidProductId))
+                .thenThrow(new ResourceNotFoundException());
     }
 
     private void mockCreateProduct() {
