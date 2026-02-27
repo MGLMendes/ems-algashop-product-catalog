@@ -4,6 +4,7 @@ plugins {
 	id 'org.springframework.boot' version '3.5.11'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.springframework.cloud.contract' version '4.3.1'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.algaworks.algashop'
@@ -32,19 +33,23 @@ publishing {
 
 ext {
 	set('springCloudVersion', "2025.0.1")
+	set('snippetsDir', file("build/generated-snippets"))
 }
 
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	asciidoctorExt
 }
 
 dependencies {
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -61,9 +66,21 @@ contracts {
 }
 
 tasks.named('contractTest') {
+	outputs.dir snippetsDir
 	useJUnitPlatform()
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+asciidoctor {
+	dependsOn contractTest
+	inputs.dir snippetsDir
+	attributes 'snippets': snippetsDir
+	sources {
+		include 'index.adoc'
+	}
+	baseDirFollowsSourceFile()
+	outputDir = file("build/docs/asciidoc")
 }
