@@ -57,7 +57,7 @@ Contract.make {
                 inStock: false,
                 enabled: fromRequest().body('$.enabled'),
                 category: [
-                        id: fromRequest().body('$.categoryId'),
+                        id: anyUuid(),
                         name: "Notebook"
                 ],
                 description: fromRequest().body('$.description'),

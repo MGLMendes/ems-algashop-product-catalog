@@ -1,4 +1,4 @@
-package com.algawors.algashop.product.catalog.presentation;
+package com.algawors.algashop.product.catalog.presentation.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

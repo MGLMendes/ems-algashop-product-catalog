@@ -1,4 +1,4 @@
-package com.algawors.algashop.product.catalog.presentation;
+package com.algawors.algashop.product.catalog.presentation.exceptionhandler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
