@@ -2,9 +2,11 @@ package com.algawors.algashop.product.catalog.application.category.service;
 
 import com.algawors.algashop.product.catalog.application.category.input.CategoryInput;
 import jakarta.validation.Valid;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Service
 public class CategoryManagementService {
     public UUID create(@Valid CategoryInput input) {
         return null;
