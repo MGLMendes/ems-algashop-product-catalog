@@ -1,7 +1,7 @@
 package com.algawors.algashop.product.catalog.infrastructure.persistence.product;
 
-import com.algawors.algashop.product.catalog.application.exception.ResourceNotFoundException;
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
+import com.algawors.algashop.product.catalog.application.product.output.ProductSummaryOutput;
 import com.algawors.algashop.product.catalog.application.product.service.query.ProductQueryService;
 import com.algawors.algashop.product.catalog.application.utility.Mapper;
 import com.algawors.algashop.product.catalog.domain.model.product.Product;
@@ -21,7 +21,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     private final Mapper mapper;
 
     @Override
-    public PageModel<ProductDetailOutput> filter(Integer size, Integer number) {
+    public PageModel<ProductSummaryOutput> filter(Integer size, Integer number) {
         return null;
     }
 

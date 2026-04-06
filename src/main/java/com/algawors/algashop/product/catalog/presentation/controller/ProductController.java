@@ -2,6 +2,7 @@ package com.algawors.algashop.product.catalog.presentation.controller;
 
 import com.algawors.algashop.product.catalog.application.product.input.ProductInput;
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
+import com.algawors.algashop.product.catalog.application.product.output.ProductSummaryOutput;
 import com.algawors.algashop.product.catalog.application.product.service.query.ProductQueryService;
 import com.algawors.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algawors.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
@@ -42,7 +43,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public PageModel<ProductDetailOutput> filter(
+    public PageModel<ProductSummaryOutput> filter(
             @RequestParam(name = "size", required = false) Integer size,
             @RequestParam(name = "number", required = false) Integer number
     ) {

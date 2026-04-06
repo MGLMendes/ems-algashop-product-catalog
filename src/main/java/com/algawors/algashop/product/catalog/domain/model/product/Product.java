@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -60,6 +61,8 @@ public class Product {
     @Field(name = "categoryId")
     private Category category;
 
+    private Integer discountPercentageRounded;
+
     @Builder
     public Product(String name, String brand, String description, Boolean enabled,
                    BigDecimal regularPrice, BigDecimal salePrice, Category category) {
@@ -95,32 +98,34 @@ public class Product {
 
     public void setRegularPrice(BigDecimal regularPrice) {
         Objects.requireNonNull(regularPrice, "regularPrice cannot be null");
-        if (regularPrice.compareTo(BigDecimal.ZERO) <= 0) {
+        if (regularPrice.signum() == -1) {
             throw  new IllegalArgumentException("Regular price cannot be less than zero");
         }
 
         if (this.salePrice == null) {
             this.salePrice = regularPrice;
-        } else if (regularPrice.compareTo(this.salePrice) <= 0) {
+        } else if (regularPrice.compareTo(this.salePrice) < 0) {
             throw new DomainException("Sale Price cannot be greater than regular price");
         }
 
         this.regularPrice = regularPrice;
+        this.calculateDiscountPercentage();
     }
 
     public void setSalePrice(BigDecimal salePrice) {
         Objects.requireNonNull(salePrice, "salePrice cannot be null");
-        if (salePrice.compareTo(BigDecimal.ZERO) <= 0) {
+        if (salePrice.signum() == -1) {
             throw  new IllegalArgumentException("Sale price cannot be less than zero");
         }
 
         if (this.regularPrice == null) {
             this.regularPrice = salePrice;
-        } else if (this.regularPrice.compareTo(salePrice) <= 0) {
+        } else if (this.regularPrice.compareTo(salePrice) < 0) {
             throw new DomainException("Sale Price cannot be greater than regular price");
         }
 
         this.salePrice = salePrice;
+        this.calculateDiscountPercentage();
     }
 
     public void setEnabled(boolean enabled) {
@@ -150,6 +155,22 @@ public class Product {
 
     public boolean isInStock() {
         return this.quantityInStock != null && this.quantityInStock > 0;
+    }
+
+    public boolean hasDiscount() {
+        return this.discountPercentageRounded != null && this.discountPercentageRounded > 0;
+    }
+
+    private void calculateDiscountPercentage() {
+        if (regularPrice == null || salePrice == null || regularPrice.signum() == 0) {
+            discountPercentageRounded = 0;
+            return;
+        }
+
+        discountPercentageRounded = BigDecimal.ONE
+                .subtract(salePrice.divide(regularPrice, 4, RoundingMode.HALF_UP))
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(0, RoundingMode.HALF_UP).intValue();
     }
 
 }
