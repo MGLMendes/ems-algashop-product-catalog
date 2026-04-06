@@ -1,19 +1,17 @@
 package com.algawors.algashop.product.catalog.presentation.controller;
 
 import com.algawors.algashop.product.catalog.application.product.input.ProductInput;
-import com.algawors.algashop.product.catalog.application.product.output.CategoryMinimalOutput;
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
-import com.algawors.algashop.product.catalog.application.product.query.ProductQueryService;
-import com.algawors.algashop.product.catalog.application.product.service.ProductManagementApplicationService;
+import com.algawors.algashop.product.catalog.application.product.service.query.ProductQueryService;
+import com.algawors.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
+import com.algawors.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
+import com.algawors.algashop.product.catalog.presentation.exceptionhandler.UnprocessableContentException;
 import com.algawors.algashop.product.catalog.presentation.model.PageModel;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,7 +25,13 @@ public class ProductController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ProductDetailOutput create(@RequestBody @Valid ProductInput productInput) {
-        UUID productId = productManagementApplicationService.create(productInput);
+        UUID productId;
+        try {
+            productId = productManagementApplicationService.create(productInput);
+        } catch (CategoryNotFoundException e) {
+            throw new UnprocessableContentException(e.getMessage());
+
+        }
         return productQueryService.findById(productId);
     }
 

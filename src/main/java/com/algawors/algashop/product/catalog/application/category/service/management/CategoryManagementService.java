@@ -1,13 +1,13 @@
-package com.algawors.algashop.product.catalog.application.category.service;
+package com.algawors.algashop.product.catalog.application.category.service.management;
 
 import com.algawors.algashop.product.catalog.application.category.input.CategoryInput;
 import com.algawors.algashop.product.catalog.application.exception.ResourceNotFoundException;
 import com.algawors.algashop.product.catalog.domain.model.category.Category;
+import com.algawors.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.algawors.algashop.product.catalog.domain.model.category.CategoryRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class CategoryManagementService {
 
     public void update(UUID categoryId, CategoryInput input) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new ResourceNotFoundException()
+                () -> new CategoryNotFoundException(categoryId)
         );
         category.setName(input.getName());
         category.setEnabled(input.getEnabled());
@@ -34,7 +34,7 @@ public class CategoryManagementService {
 
     public void disable(UUID categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(
-                () -> new ResourceNotFoundException()
+                () -> new CategoryNotFoundException(categoryId)
         );
         category.setEnabled(false);
         categoryRepository.save(category);

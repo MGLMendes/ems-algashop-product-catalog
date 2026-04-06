@@ -1,10 +1,12 @@
-package com.algawors.algashop.product.catalog.application.product.service;
+package com.algawors.algashop.product.catalog.application.product.service.management;
 
 import com.algawors.algashop.product.catalog.application.exception.ResourceNotFoundException;
 import com.algawors.algashop.product.catalog.application.product.input.ProductInput;
 import com.algawors.algashop.product.catalog.domain.model.category.Category;
+import com.algawors.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.algawors.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.algawors.algashop.product.catalog.domain.model.product.Product;
+import com.algawors.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.algawors.algashop.product.catalog.domain.model.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,7 +48,7 @@ public class ProductManagementApplicationService {
 
     private Category findCategory(ProductInput productInput) {
         return categoryRepository.findById(productInput.getCategoryId()).orElseThrow(
-                ResourceNotFoundException::new
+                () -> new CategoryNotFoundException(productInput.getCategoryId())
         );
     }
 }

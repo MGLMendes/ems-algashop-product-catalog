@@ -3,8 +3,8 @@ package com.algawors.algashop.product.catalog.presentation.controller;
 
 import com.algawors.algashop.product.catalog.application.category.input.CategoryInput;
 import com.algawors.algashop.product.catalog.application.category.output.CategoryDetailOutput;
-import com.algawors.algashop.product.catalog.application.category.service.CategoryManagementService;
-import com.algawors.algashop.product.catalog.application.category.service.CategoryQueryService;
+import com.algawors.algashop.product.catalog.application.category.service.management.CategoryManagementService;
+import com.algawors.algashop.product.catalog.application.category.service.query.CategoryQueryService;
 import com.algawors.algashop.product.catalog.presentation.model.PageModel;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

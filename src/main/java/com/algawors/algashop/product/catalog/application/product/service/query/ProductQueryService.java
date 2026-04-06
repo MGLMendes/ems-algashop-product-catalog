@@ -1,4 +1,4 @@
-package com.algawors.algashop.product.catalog.application.product.query;
+package com.algawors.algashop.product.catalog.application.product.service.query;
 
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algawors.algashop.product.catalog.presentation.model.PageModel;

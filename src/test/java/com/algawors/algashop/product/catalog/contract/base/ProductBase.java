@@ -4,8 +4,8 @@ import com.algawors.algashop.product.catalog.application.exception.ResourceNotFo
 import com.algawors.algashop.product.catalog.application.product.input.ProductInput;
 import com.algawors.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algawors.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
-import com.algawors.algashop.product.catalog.application.product.query.ProductQueryService;
-import com.algawors.algashop.product.catalog.application.product.service.ProductManagementApplicationService;
+import com.algawors.algashop.product.catalog.application.product.service.query.ProductQueryService;
+import com.algawors.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algawors.algashop.product.catalog.presentation.controller.ProductController;
 import com.algawors.algashop.product.catalog.presentation.model.PageModel;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
