@@ -12,9 +12,17 @@ import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +30,49 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     private final ProductRepository productRepository;
     private final Mapper mapper;
+    private final MongoOperations mongoOperations;
 
     @Override
     public PageModel<ProductSummaryOutput> filter(ProductFilter productFilter) {
-        Page<Product> products = productRepository.findAll(PageRequest.of(productFilter.getPage(), productFilter.getSize()));
-        Page<ProductSummaryOutput> productOutputs = products.map(p -> mapper.convert(p, ProductSummaryOutput.class));
-        return PageModel.of(productOutputs);
+        Query query = queryWith(productFilter);
+
+        long totalItems = mongoOperations.count(query, Product.class);
+
+        Sort sort = sortWith(productFilter);
+
+        PageRequest pageRequest = PageRequest.of(productFilter.getPage(), productFilter.getSize(), sort);
+        Query pagedQuery = query.with(pageRequest);
+        List<Product> products;
+        int totalPages = 0;
+        if (totalItems > 0) {
+            products = mongoOperations.find(pagedQuery, Product.class);
+            totalPages = (int) Math.ceil((double) totalItems / (double) products.size());
+        } else {
+            products = new ArrayList<>();
+        }
+
+        List<ProductSummaryOutput> productSummaries =
+                products.stream().map(p -> mapper.convert(p, ProductSummaryOutput.class)).toList();
+        return PageModel.<ProductSummaryOutput>builder()
+                .content(productSummaries)
+                .number(pageRequest.getPageNumber())
+                .size(pageRequest.getPageSize())
+                .totalElements(totalItems)
+                .totalPages(totalPages)
+                .build();
+    }
+
+    private Sort sortWith(ProductFilter productFilter) {
+        return Sort.by(productFilter.getSortDirectionOrDefault(),
+                productFilter.getSortByPropertyOrDefault().getPropertyName());
+    }
+
+    private Query queryWith(ProductFilter filter) {
+        Query query = new Query();
+        if (filter.getEnabled() != null) {
+            query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
+        }
+        return query;
     }
 
     @Override
