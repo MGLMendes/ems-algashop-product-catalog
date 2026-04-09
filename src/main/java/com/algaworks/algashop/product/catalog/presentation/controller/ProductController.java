@@ -3,6 +3,7 @@ package com.algaworks.algashop.product.catalog.presentation.controller;
 import com.algaworks.algashop.product.catalog.application.product.input.ProductInput;
 import com.algaworks.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algaworks.algashop.product.catalog.application.product.output.ProductSummaryOutput;
+import com.algaworks.algashop.product.catalog.application.product.service.query.ProductFilter;
 import com.algaworks.algashop.product.catalog.application.product.service.query.ProductQueryService;
 import com.algaworks.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
@@ -43,11 +44,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public PageModel<ProductSummaryOutput> filter(
-            @RequestParam(name = "size", required = false) Integer size,
-            @RequestParam(name = "page", required = false) Integer page
-    ) {
-        return productQueryService.filter(size, page);
+    public PageModel<ProductSummaryOutput> filter(ProductFilter productFilter) {
+        return productQueryService.filter(productFilter);
     }
 
     @PutMapping("/{productId}")

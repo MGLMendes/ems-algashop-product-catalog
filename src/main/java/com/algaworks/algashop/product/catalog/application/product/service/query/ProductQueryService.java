@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface ProductQueryService {
 
-   PageModel<ProductSummaryOutput> filter(Integer size, Integer number);
+   PageModel<ProductSummaryOutput> filter(ProductFilter productFilter);
    ProductDetailOutput findById(UUID productId);
 }
