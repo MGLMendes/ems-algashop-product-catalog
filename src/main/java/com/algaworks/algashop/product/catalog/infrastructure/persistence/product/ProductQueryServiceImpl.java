@@ -9,6 +9,8 @@ import com.algaworks.algashop.product.catalog.domain.model.product.ProductNotFou
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
 import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -22,7 +24,9 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     @Override
     public PageModel<ProductSummaryOutput> filter(Integer size, Integer number) {
-        return null;
+        Page<Product> products = productRepository.findAll(PageRequest.of(number, size));
+        Page<ProductSummaryOutput> productOutputs = products.map(p -> mapper.convert(p, ProductSummaryOutput.class));
+        return PageModel.of(productOutputs);
     }
 
     @Override
