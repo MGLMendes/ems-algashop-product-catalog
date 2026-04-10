@@ -10,7 +10,6 @@ import com.algaworks.algashop.product.catalog.domain.model.product.ProductNotFou
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
 import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -19,10 +18,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +68,16 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         Query query = new Query();
         if (filter.getEnabled() != null) {
             query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
+        }
+
+        if (filter.getAddedAtFrom() != null && filter.getAddedAtTo() != null) {
+            query.addCriteria(Criteria.where("addedAt").gte(filter.getAddedAtFrom()).lte(filter.getAddedAtTo()));
+        } else {
+            if (filter.getAddedAtFrom() != null) {
+                query.addCriteria(Criteria.where("addedAt").gte(filter.getAddedAtFrom()));
+            } else if (filter.getAddedAtTo() != null) {
+                query.addCriteria(Criteria.where("addedAt").lte(filter.getAddedAtTo()));
+            }
         }
         return query;
     }
