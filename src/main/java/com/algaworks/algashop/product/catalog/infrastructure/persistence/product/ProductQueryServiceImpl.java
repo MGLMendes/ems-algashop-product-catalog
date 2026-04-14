@@ -33,8 +33,6 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     private final Mapper mapper;
     private final MongoOperations mongoOperations;
 
-    private static final String findWordRegex = "(?i)%s";
-
     @Override
     public PageModel<ProductSummaryOutput> filter(ProductFilter productFilter) {
         Query query = queryWith(productFilter);
