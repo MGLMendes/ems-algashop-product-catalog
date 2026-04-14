@@ -6,7 +6,9 @@ import com.algaworks.algashop.product.catalog.domain.utility.IdGenerator;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,6 +23,13 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@CompoundIndex(name = "pidx_product_by_category_enabledTrue_salePrice",
+        def = "{'categoryId': 1, 'salePrice': 1}",
+        partialFilter = "{'enabled': true}")
+@CompoundIndex(name = "pidx_product_by_category_enabledTrue_addedAt",
+        def = "{'categoryId': 1, 'addedAt': -1}",
+        partialFilter = "{'enabled': true}"
+)
 public class Product {
 
     @Id
@@ -58,7 +67,6 @@ public class Product {
     @LastModifiedBy
     private UUID modifiedByUserId;
 
-    @Indexed(name = "idx_product_by_category")
     @DocumentReference(lazy = true)
     @Field(name = "categoryId")
     private Category category;
