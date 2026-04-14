@@ -22,7 +22,7 @@ public class ModelMapperConfig {
     };
 
     private final Converter<String, String> fromStringToShortStringConverter = context -> {
-        return StringUtils.abbreviate(context.getSource(), 15);
+        return StringUtils.abbreviate(context.getSource(), 50);
     };
 
 
