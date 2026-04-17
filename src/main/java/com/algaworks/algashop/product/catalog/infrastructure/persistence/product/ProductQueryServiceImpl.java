@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,21 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     public PageModel<ProductSummaryOutput> filter(ProductFilter productFilter) {
         Optional<Criteria> criteria = buildCriteria(productFilter);
         Optional<TextCriteria> textCriteria = buildTextCriteria(productFilter);
+
+        Query query = new Query();
+        textCriteria.ifPresent(query::addCriteria);
+        criteria.ifPresent(query::addCriteria);
+
+        long totalElements = mongoOperations.count(query, Product.class);
+
+        if (totalElements == 0) {
+            return PageModel.<ProductSummaryOutput>builder()
+                    .number(0)
+                    .totalElements(0)
+                    .size(0)
+                    .totalPages(0)
+                    .build();
+        }
 
         List<AggregationOperation> operations = new ArrayList<>();
 
@@ -57,12 +73,14 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         List<ProductSummaryOutput> productSummaryOutputs = mongoOperations.aggregate(aggregation, Product.class, ProductSummaryOutput.class).getMappedResults();
 
+        int totalPages = (int) Math.ceil((double) totalElements / (double) productFilter.getSize());
+
         return PageModel.<ProductSummaryOutput>builder()
                 .content(productSummaryOutputs)
                 .number(productFilter.getPage())
                 .size(productFilter.getSize())
-                .totalElements(10)
-                .totalPages(10)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
                 .build();
     }
 
