@@ -87,6 +87,12 @@ public class Product extends AbstractAggregateRoot<Product> {
         setSalePrice(salePrice);
         setQuantityInStock(0);
         setCategory(category);
+
+        super.registerEvent(
+                ProductAddedEvent.builder()
+                        .productId(this.id)
+                        .build()
+        );
     }
 
     public void setName(String name) {
@@ -185,7 +191,17 @@ public class Product extends AbstractAggregateRoot<Product> {
     }
 
     public void setEnabled(boolean enabled) {
+        Boolean wasEnabled = this.enabled;
         this.enabled = enabled;
+        if (wasEnabled != null && wasEnabled && !this.getEnabled()) {
+            this.registerEvent(ProductDelistedEvent.builder()
+                    .productId(this.getId())
+                    .build());
+        } else if (wasEnabled != null && !wasEnabled && this.getEnabled()) {
+            this.registerEvent(ProductListedEvent.builder()
+                    .productId(this.getId())
+                    .build());
+        }
     }
 
     public void disable() {
