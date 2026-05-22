@@ -45,12 +45,12 @@ public class CategoryBase {
 
         RestAssuredMockMvc.enableLoggingOfRequestAndResponseIfValidationFails();
 
-        Mockito.when(categoryQueryService.filter(Mockito.any(CategoryFilter.class)))
+        Mockito.when(categoryQueryService.filter(Mockito.any()))
                 .then((answer)-> {
-                    Integer size = answer.getArgument(0);
+                    CategoryFilter filter = answer.getArgument(0);
                     return PageModel.<CategoryDetailOutput>builder()
                             .number(0)
-                            .size(size)
+                            .size(filter.getSize())
                             .totalPages(1)
                             .totalElements(2)
                             .content(

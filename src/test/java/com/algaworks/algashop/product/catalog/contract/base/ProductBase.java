@@ -4,6 +4,7 @@ import com.algaworks.algashop.product.catalog.application.exception.ResourceNotF
 import com.algaworks.algashop.product.catalog.application.product.input.ProductInput;
 import com.algaworks.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
+import com.algaworks.algashop.product.catalog.application.product.service.query.ProductFilter;
 import com.algaworks.algashop.product.catalog.application.product.service.query.ProductQueryService;
 import com.algaworks.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algaworks.algashop.product.catalog.presentation.controller.ProductController;
@@ -85,10 +86,10 @@ public class ProductBase {
         Mockito.when(productQueryService.filter(Mockito.any()))
                 .then(
                         (answer) -> {
-                            Integer size = answer.getArgument(0);
+                            ProductFilter filter = answer.getArgument(0);
                             return PageModel.<ProductDetailOutput>builder()
                                     .number(0)
-                                    .size(size)
+                                    .size(filter.getSize())
                                     .totalPages(1)
                                     .totalElements(2)
                                     .content(List.of(
