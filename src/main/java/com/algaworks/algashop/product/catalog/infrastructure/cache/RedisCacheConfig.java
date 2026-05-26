@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 
+import java.time.Duration;
+
 import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
 
 @Configuration
@@ -17,11 +19,12 @@ public class RedisCacheConfig {
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
         RedisCacheConfiguration redisCacheConfiguration = defaultCacheConfig()
-                .computePrefixWith(c -> c + ":");
+                .computePrefixWith(c -> c + ":")
+                .entryTtl(Duration.ofMinutes(1));
         return builder -> {
           builder.cacheDefaults(redisCacheConfiguration)
                   .withCacheConfiguration("algashop:products:v1",
-                          defaultCacheConfig().disableCachingNullValues());
+                          defaultCacheConfig().disableCachingNullValues().entryTtl(Duration.ofMinutes(5)));
         };
     }
 }
