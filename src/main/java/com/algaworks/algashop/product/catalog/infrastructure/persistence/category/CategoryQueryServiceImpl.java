@@ -3,29 +3,33 @@ package com.algaworks.algashop.product.catalog.infrastructure.persistence.catego
 import com.algaworks.algashop.product.catalog.application.category.output.CategoryDetailOutput;
 import com.algaworks.algashop.product.catalog.application.category.service.query.CategoryFilter;
 import com.algaworks.algashop.product.catalog.application.category.service.query.CategoryQueryService;
-import com.algaworks.algashop.product.catalog.application.product.output.ProductSummaryOutput;
 import com.algaworks.algashop.product.catalog.application.utility.Mapper;
 import com.algaworks.algashop.product.catalog.domain.model.category.Category;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.algaworks.algashop.product.catalog.domain.model.category.CategoryRepository;
-import com.algaworks.algashop.product.catalog.domain.model.product.Product;
 import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@CrossOrigin
 public class CategoryQueryServiceImpl implements CategoryQueryService {
 
     private final CategoryRepository categoryRepository;
@@ -60,6 +64,22 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
                 .totalElements(totalItems)
                 .totalPages(totalPages)
                 .build();
+    }
+
+    @Override
+    public OffsetDateTime lastModified() {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.group().max("updatedAt").as("lastModified")
+        );
+
+        AggregationResults<Document> results = mongoOperations.aggregate(aggregation, "categories", Document.class);
+        Document document = results.getUniqueMappedResult();
+
+        if (document == null) {
+            return OffsetDateTime.now();
+        }
+
+        return document.getDate("lastModified").toInstant().atOffset(ZoneOffset.UTC);
     }
 
     private Sort sortWith(CategoryFilter categoryFilter) {

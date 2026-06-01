@@ -4,9 +4,9 @@ import com.algaworks.algashop.product.catalog.application.exception.ResourceNotF
 import com.algaworks.algashop.product.catalog.application.product.input.ProductInput;
 import com.algaworks.algashop.product.catalog.application.product.output.ProductDetailOutput;
 import com.algaworks.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
+import com.algaworks.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algaworks.algashop.product.catalog.application.product.service.query.ProductFilter;
 import com.algaworks.algashop.product.catalog.application.product.service.query.ProductQueryService;
-import com.algaworks.algashop.product.catalog.application.product.service.management.ProductManagementApplicationService;
 import com.algaworks.algashop.product.catalog.presentation.controller.ProductController;
 import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -61,6 +61,7 @@ public class ProductBase {
         mockFindProducts();
         mockFilterProducts();
         mockCreateProduct();
+        mockValidProductUpdate();
         mockInvalidFindById();
     }
 
@@ -70,11 +71,17 @@ public class ProductBase {
     }
 
     private void mockCreateProduct() {
+        ProductDetailOutput productDetailOutput = ProductDetailOutputTestDataBuilder.aProduct().id(createdProductId).inStock(false).build();
         Mockito.when(productManagementApplicationService.create(Mockito.any(ProductInput.class)))
-                .thenReturn(createdProductId);
+                .thenReturn(productDetailOutput);
 
         Mockito.when(productQueryService.findById(createdProductId))
-                .thenReturn(ProductDetailOutputTestDataBuilder.aProduct().inStock(false).build());
+                .thenReturn(productDetailOutput);
+    }
+
+    private void mockValidProductUpdate() {
+        Mockito.when(productManagementApplicationService.update(Mockito.any(UUID.class), Mockito.any(ProductInput.class)))
+                .thenReturn(ProductDetailOutputTestDataBuilder.aProduct().id(validProductId).build());
     }
 
     private void mockFindProducts() {

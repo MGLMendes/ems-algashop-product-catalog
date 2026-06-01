@@ -9,22 +9,44 @@ import com.algaworks.algashop.product.catalog.application.category.service.query
 import com.algaworks.algashop.product.catalog.presentation.model.PageModel;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class CategoryController {
 
     private final CategoryQueryService categoryQueryService;
     private final CategoryManagementService categoryManagementService;
 
     @GetMapping
-    public PageModel<CategoryDetailOutput> filter(CategoryFilter categoryFilter) {
-        return categoryQueryService.filter(categoryFilter);
+    public ResponseEntity<PageModel<CategoryDetailOutput>> filter(CategoryFilter categoryFilter, WebRequest request) {
+
+        if (!categoryFilter.isCacheable()) {
+            PageModel<CategoryDetailOutput> results = categoryQueryService.filter(categoryFilter);
+            return ResponseEntity.ok(results);
+        }
+
+        OffsetDateTime lastModified = categoryQueryService.lastModified();
+
+        if (request.checkNotModified(lastModified.toInstant().toEpochMilli())) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+
+        PageModel<CategoryDetailOutput> results = categoryQueryService.filter(categoryFilter);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
+                .lastModified(lastModified.toInstant())
+                .body(results);
     }
 
     @PostMapping
@@ -35,8 +57,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryDetailOutput findById(@PathVariable UUID categoryId) {
-        return categoryQueryService.findById(categoryId);
+    public ResponseEntity<CategoryDetailOutput> findById(@PathVariable UUID categoryId) {
+        CategoryDetailOutput category = categoryQueryService.findById(categoryId);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
+                .eTag("category:id:"+ category.getId() + ":v:" + category.getVersion())
+                .lastModified(category.getUpdatedAt().toInstant())
+                .body(category);
     }
 
     @PutMapping("/{categoryId}")

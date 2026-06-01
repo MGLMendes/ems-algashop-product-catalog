@@ -18,6 +18,7 @@ public class ProductDetailOutputTestDataBuilder {
                 .name("Notebook X11")
                 .brand("Deep Diver")
                 .description("A Gamer Notebook")
+                .updatedAt(OffsetDateTime.now())
                 .regularPrice(new BigDecimal("1500.00"))
                 .salePrice(new BigDecimal("1000.0"))
                 .inStock(true)
