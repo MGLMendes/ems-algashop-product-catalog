@@ -11,8 +11,6 @@ logging:
   level:
     org.mongodb.driver.cluster: OFF
 
-
-
 algashop:
   data-load:
     enabled: false
@@ -26,6 +24,9 @@ algashop:
 management:
   info:
     env.enabled: true
+  health:
+    redis:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -36,5 +37,7 @@ management:
       group:
         readiness:
           include: mongo,readinessState
+      status:
+        order: "DOWN, OUT_OF_SERVICE, UNKNOWN, DEGRADED, UP"
 info:
   app.name: AlgaShop Product Catalog API
