@@ -16,8 +16,7 @@ import org.springframework.data.mongodb.core.mapping.TextScore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Document(collection = "products")
 @Getter
@@ -75,6 +74,10 @@ public class Product extends AbstractAggregateRoot<Product> {
     @TextScore
     private Float score;
 
+    private Image mainImage;
+
+    private Set<Image> images = new HashSet<>();
+
     @Builder
     public Product(String name, String brand, String description, Boolean enabled,
                    BigDecimal regularPrice, BigDecimal salePrice, Category category) {
@@ -112,6 +115,45 @@ public class Product extends AbstractAggregateRoot<Product> {
     public void setCategory(Category category) {
         Objects.requireNonNull(category, "category cannot be null");
         this.category = ProductCategory.of(category);
+    }
+
+    public Set<Image> getImages() {
+        return Collections.unmodifiableSet(images);
+    }
+
+    public Optional<Image> getImage(UUID imageId) {
+        Objects.requireNonNull(imageId, "imageId cannot be null");
+        return this.images.stream().filter(image -> image.getId().equals(imageId)).findFirst();
+    }
+
+    public UUID addImage(String imageName) {
+        Objects.requireNonNull(imageName, "image name cannot be null");
+        Image image = new Image(imageName);
+        this.images.add(image);
+        if (this.mainImage == null) {
+            this.setMainImage(image);
+        }
+        return image.getId();
+    }
+
+    public void changeMainImage(UUID imageId) {
+        Objects.requireNonNull(imageId, "imageId cannot be null");
+        Image image = findImageById(imageId);
+        setMainImage(image);
+    }
+
+    private Image findImageById(UUID imageId) {
+        return getImage(imageId).orElseThrow(() -> new DomainException(
+                String.format("Image of id %s was not found on product %s", imageId, id)));
+    }
+
+    public void removeImage(UUID imageId) {
+        Objects.requireNonNull(imageId, "imageId cannot be null");
+        Image image = findImageById(imageId);
+        this.images.remove(image);
+        if (image.equals(this.mainImage)) {
+            this.setMainImage(this.images.stream().findFirst().orElse(null));
+        }
     }
 
     public void changePrice(BigDecimal regularPrice, BigDecimal salePrice) {
@@ -223,6 +265,11 @@ public class Product extends AbstractAggregateRoot<Product> {
             throw  new DomainException("quantityInStock cannot be less than zero");
         }
         this.quantityInStock = quantityInStock;
+    }
+
+    private void setMainImage(Image mainImage) {
+        Objects.requireNonNull(mainImage, "main image cannot be null");
+        this.mainImage = mainImage;
     }
 
     public boolean isInStock() {
