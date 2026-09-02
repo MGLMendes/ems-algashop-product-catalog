@@ -11,6 +11,7 @@ import com.algaworks.algashop.product.catalog.domain.model.product.ProductNotFou
 import com.algaworks.algashop.product.catalog.domain.model.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -24,6 +25,7 @@ public class ProductImageManagementApplicationService {
     private final StorageProvider storageProvider;
     private final Mapper mapper;
 
+    @CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
     public ImageOutput create(UUID productId, ImageInput imageInput) {
         Objects.requireNonNull(productId, "productId is required");
         Objects.requireNonNull(imageInput);
@@ -46,6 +48,7 @@ public class ProductImageManagementApplicationService {
         return mapper.convert(image, ImageOutput.class);
     }
 
+    @CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
     public void delete(UUID productId, UUID imageId) {
         Objects.requireNonNull(productId, "productId is required");
         Objects.requireNonNull(imageId, "imageId is required");
@@ -61,6 +64,7 @@ public class ProductImageManagementApplicationService {
         productRepository.save(product);
     }
 
+    @CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
     public void primary(UUID productId, UUID imageId) {
         Objects.requireNonNull(productId, "productId is required");
         Objects.requireNonNull(imageId, "imageId is required");
